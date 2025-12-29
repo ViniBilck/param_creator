@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-def create_params(file_name, param_template, output_path, ic_path):
+def create_params(file_name, output_path, ic_path):
     dirName = "params_temp"
     if not os.path.exists(dirName):
         os.mkdir(dirName)
@@ -11,7 +11,7 @@ def create_params(file_name, param_template, output_path, ic_path):
     save_param = os.path.join(dirName, file_name)
     op_path_template = "__output__path__"
     ic_path_template = "__ic__path__"
-    with open(param_template, 'r', encoding='utf-8') as param:
+    with open("param_template.txt", 'r', encoding='utf-8') as param:
         content = param.read()
     with open(save_param, 'w', encoding='utf-8') as file:
         new_content = content.replace(op_path_template, output_path)
@@ -19,23 +19,6 @@ def create_params(file_name, param_template, output_path, ic_path):
         file.write(new_content)
         file.close()
         param.close()
-
-def create_ics(data_csv_file, galaxy_file1, galaxy_file2):
-    """
-    usar ICCR como biblioteca ou como subprocesso ?
-    usar open_coord_csv para pegar as coordenadas do arquivo do queorbita
-    """
-    dirName = "ics_temp"
-    if not os.path.exists(dirName):
-        os.mkdir(dirName)
-        print("Directory " , dirName ,  " Created ")
-    else:
-        print("Directory " , dirName ,  " already exists")
-
-    data_ic = data_csv_file
-    fnameIn = "config.ini" #criar configs
-    ret=subprocess.call("collision " + fnameIn, shell=True, stdout=subprocess.DEVNULL)
-    ret=subprocess.call("mv orbits_pot_hbd_din_fric.dat " + fnameOrbit, shell=True, stdout=subprocess.DEVNULL)
 
 def create_config():
     dirName = "config_temp"
@@ -68,13 +51,13 @@ def create_config():
                     file.write(content)
                     file.close()
                     param.close()
-                j+=1
+                j += 1
     except Exception as e:
         print(f"Drop orbits_temp directory in the directory: {e}")
     return 0
 
 def run_iccr():
-    dirName = "ic_temp"
+    dirName = "ic"
     if not os.path.exists(dirName):
         os.mkdir(dirName)
         print("Directory " , dirName ,  " Created ")
@@ -86,10 +69,13 @@ def run_iccr():
             fname = configs_
             if fname != '.ipynb_checkpoints':
                 os.system(f'collision config_temp/{fname}')
-                os.rename("collision.ini", f"collision_orb_{counter_name}.hdf5")
+                os.rename("collision_file.hdf5", f"collision_orb_{counter_name}.hdf5")
+                os.system(f"cp collision_orb_{counter_name}.hdf5 ic/")
+                os.system(f"rm collision_orb_{counter_name}.hdf5")
+                create_params(f"param_{counter_name}.txt", f"../outputs/collision_orb_{counter_name}",f"ic/collision_orb_{counter_name}")
+            counter_name += 1
     except Exception as e:
         print(f"Verify ICCR code: {e}")
     return 0
-
-    return None
 create_config()
+run_iccr()
