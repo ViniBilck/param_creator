@@ -49,7 +49,7 @@ def create_config():
     try:
         for i in sorted(os.listdir('orbits_temp/')):
             fname = i
-            if fname != '.ipynb_checkpoints':   
+            if fname != '.ipynb_checkpoints':
                 orb = pd.read_csv(f'orbits_temp/{fname}', sep="\t")
                 data_initial = orb.loc[0]
                 config_template = "config_template.ini"
@@ -59,7 +59,7 @@ def create_config():
                         data_initial.Vx_kepl, data_initial.Vy_kepl, data_initial.Vz_kepl] #dados do queorbita
                 replacements = {"__g1cx__":data[0] , "__g1cy__":data[1],"__g1cz__":data[2],
                                 "__g1vx__":data[3], "__g1vy__":data[4],"__g1vz__":data[5]}
-                
+
                 with open(config_template, 'r', encoding='utf-8') as param:
                     content = param.read()
                 with open(save_configs, 'w', encoding='utf-8') as file:
@@ -73,10 +73,23 @@ def create_config():
         print(f"Drop orbits_temp directory in the directory: {e}")
     return 0
 
-def make_chain(csv_file, galaxy_file1, galaxy_file2):
-    for data in open_coord_csv(csv_file):
-        create_ics(data, galaxy_file1, galaxy_file2)
-        create_params(...)
+def run_iccr():
+    dirName = "ic_temp"
+    if not os.path.exists(dirName):
+        os.mkdir(dirName)
+        print("Directory " , dirName ,  " Created ")
+    else:
+        print("Directory " , dirName ,  " already exists")
+    counter_name=0
+    try:
+        for configs_ in sorted(os.listdir('config_temp/')):
+            fname = configs_
+            if fname != '.ipynb_checkpoints':
+                os.system(f'collision config_temp/{fname}')
+                os.rename("collision.ini", f"collision_orb_{counter_name}.hdf5")
+    except Exception as e:
+        print(f"Verify ICCR code: {e}")
+    return 0
 
     return None
 create_config()
