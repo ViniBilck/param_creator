@@ -72,7 +72,7 @@ def run_iccr():
                 os.rename("collision_file.hdf5", f"collision_orb_{counter_name}.hdf5")
                 os.system(f"cp collision_orb_{counter_name}.hdf5 ic/")
                 os.system(f"rm collision_orb_{counter_name}.hdf5")
-                create_params(f"param_{counter_name}.txt", f"../outputs/collision_orb_{counter_name}",f"ic/collision_orb_{counter_name}")
+                create_params(f"param_{counter_name}.txt", f"../outputs/collision_orb_{counter_name}/",f"ic/collision_orb_{counter_name}")
             counter_name += 1
     except Exception as e:
         print(f"Verify ICCR code: {e}")
